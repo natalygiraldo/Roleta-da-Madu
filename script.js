@@ -17,7 +17,6 @@ const ctx = canvas.getContext("2d");
 const radius = canvas.width / 2;
 
 let angle = 0;
-let lastTickIndex = -1; //sincroniza
 
 function drawWheel() {
   const arc = (2 * Math.PI) / languages.length;
@@ -40,26 +39,6 @@ function drawWheel() {
   }
 }
 
-// 🔊 SONIDO DINÁMICO (sin archivo)
-function playTickSound() {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.type = "square";
-  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-
-  gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-
-  osc.start();
-  osc.stop(audioCtx.currentTime + 0.03);
-}
-
 function spinWheel() {
   const spinTime = Math.random() * 3000 + 2000;
   const start = performance.now();
@@ -73,15 +52,6 @@ function spinWheel() {
 
     angle = easeOut * finalAngle;
     drawRotatedWheel(angle);
-
-    // 🔥 sincronización exacta con sectores
-    const arc = (2 * Math.PI) / languages.length;
-    const currentIndex = Math.floor((angle % (2 * Math.PI)) / arc);
-
-    if (currentIndex !== lastTickIndex) {
-      playTickSound();
-      lastTickIndex = currentIndex;
-    }
 
     if (progress < 1) {
       requestAnimationFrame(animate);
